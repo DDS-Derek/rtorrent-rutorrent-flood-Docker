@@ -1,6 +1,6 @@
-ARG RTAG=3.10-0.9.8-0.13.8
+ARG DOCKER_METADATA_OUTPUT_VERSION
 
-FROM crazymax/rtorrent-rutorrent:${RTAG}
+FROM crazymax/rtorrent-rutorrent:${DOCKER_METADATA_OUTPUT_VERSION}
 
 RUN set -ex && \
     apk add --no-cache \
