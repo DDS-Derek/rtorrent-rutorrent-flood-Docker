@@ -1,6 +1,6 @@
-ARG DOCKER_METADATA_OUTPUT_VERSION
+ARG RT_RU_VERSION
 
-FROM crazymax/rtorrent-rutorrent:${DOCKER_METADATA_OUTPUT_VERSION}
+FROM crazymax/rtorrent-rutorrent:${RT_RU_VERSION}
 
 RUN set -ex && \
     apk add --no-cache \
