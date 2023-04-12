@@ -1,6 +1,9 @@
 # rtorrent-rutorrent-flood-Docker
 
+基础镜像: https://github.com/crazy-max/docker-rtorrent-rutorrent
+
 flood: https://github.com/jesec/flood
+
 geoip-updater: https://github.com/crazy-max/geoip-updater
 
 ```bash
