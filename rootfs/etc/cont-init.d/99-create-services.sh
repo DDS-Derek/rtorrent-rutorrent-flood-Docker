@@ -39,9 +39,9 @@ s6-setuidgid ${PUID}:${PGID}
 EOL
 chmod +x /etc/services.d/geoip_updater/run
 
-mkdir -p /etc/services.d/rt_log
-cat > /etc/services.d/rt_log/run <<EOL
+mkdir -p /etc/services.d/out_rtorrent_log
+cat > /etc/services.d/out_rtorrent_log/run <<EOL
 #!/bin/bash
 exec s6-setuidgid ${PUID}:${PGID} bash -c 'tail -f /data/rtorrent/log/*.log'
 EOL
-chmod +x /etc/services.d/rt_log/run
+chmod +x /etc/services.d/out_rtorrent_log/run
