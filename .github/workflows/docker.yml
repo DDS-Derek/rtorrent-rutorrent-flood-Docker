@@ -1,12 +1,14 @@
 name: Build image
 
 on:
-    release:
-        types: [published]
+  workflow_dispatch:
 
 jobs:
-  push:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [ 3.10-0.9.8-0.13.8, 4.0-0.9.8-0.13.8, 4.0.1-0.9.8-0.13.8, 4.1.5-0.9.8-0.13.8, 4.1.7-0.9.8-0.13.8, 4.2.2-0.9.8-0.13.8, 4.2.5-0.9.8-0.13.8, 4.2.6-0.9.8-0.13.8, 4.2.9-0.9.8-0.13.8, latest ]
     steps:
       - 
         name: Checkout
@@ -17,6 +19,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/rtorrent-rutorrent-flood
+          tags: |
+            type=raw,value=${{ matrix.version }}
 
       - 
         name: Set Up QEMU
@@ -43,7 +47,7 @@ jobs:
             linux/amd64
             linux/arm64/v8
           build-args: |
-            RT_RU_VERSION=${{ steps.meta.outputs.version }}
+            RT_RU_VERSION=${{ matrix.version }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
