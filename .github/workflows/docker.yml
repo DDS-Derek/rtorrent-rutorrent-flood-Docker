@@ -1,8 +1,12 @@
 name: Build image
 
 on:
-    release:
-        types: [published]
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - version.json
 
 jobs:
   push:
@@ -12,11 +16,34 @@ jobs:
         name: Checkout
         uses: actions/checkout@master
       
+      - 
+        name: Set Version
+        id: set-version
+        run: |
+          VERSION=$(jq -r '.version' version.json)
+          echo "VERSION=${VERSION}"
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          sed -i '11s/latest/${VERSION}, &/' .github/workflows/docker-all.yml
+
+      -
+        name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.set-version.outputs.VERSION }}
+          name: ${{ steps.set-version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/rtorrent-rutorrent-flood
+          tags: |
+            type=raw,value=${{ steps.set-version.outputs.VERSION }}
+            type=raw,value=latest
 
       - 
         name: Set Up QEMU
