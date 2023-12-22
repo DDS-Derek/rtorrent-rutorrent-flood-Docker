@@ -32,7 +32,7 @@ jobs:
           branch: master
           file_pattern: '.github/workflows/docker-all.yml'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOWS_TOKEN }}
 
       -
         name: Release
