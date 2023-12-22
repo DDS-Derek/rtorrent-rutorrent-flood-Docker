@@ -18,6 +18,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/rtorrent-rutorrent-flood
+          tags: |
+            type=raw,value=edge
 
       - 
         name: Set Up QEMU
@@ -46,6 +48,5 @@ jobs:
           build-args: |
             RT_RU_VERSION=edge
           push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/rtorrent-rutorrent-flood:edge
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
