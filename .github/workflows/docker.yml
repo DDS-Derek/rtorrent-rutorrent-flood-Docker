@@ -28,7 +28,7 @@ jobs:
       -
         uses: stefanzweifel/git-auto-commit-action@29183a25ec7450c8f6fbab7ff22ccd42d8ab7416
         with:
-          commit_message: "chore(bump): update ci version to ${.github/workflows/docker-all.yml}"
+          commit_message: "chore(bump): update ci version"
           branch: master
           file_pattern: '.github/workflows/docker-all.yml'
         env:
