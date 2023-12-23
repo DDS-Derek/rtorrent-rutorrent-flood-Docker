@@ -23,7 +23,7 @@ jobs:
           VERSION=$(jq -r '.version' version.json)
           echo "VERSION=${VERSION}"
           echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
-          sed -i "3s/latest/${VERSION}, &/" version.json
+          sed -i "1s|\"edge\"|\"${VERSION}\",&|" matrix.txt
 
       -
         uses: stefanzweifel/git-auto-commit-action@29183a25ec7450c8f6fbab7ff22ccd42d8ab7416
