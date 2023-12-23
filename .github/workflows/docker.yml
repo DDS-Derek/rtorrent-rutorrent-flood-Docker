@@ -15,8 +15,6 @@ jobs:
       - 
         name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.WORKFLOWS_TOKEN }}
       
       - 
         name: Set Version
@@ -25,16 +23,16 @@ jobs:
           VERSION=$(jq -r '.version' version.json)
           echo "VERSION=${VERSION}"
           echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
-          sed -i "11s/latest/${VERSION}, &/" .github/workflows/docker-all.yml
+          sed -i "3s/latest/${VERSION}, &/" version.json
 
       -
         uses: stefanzweifel/git-auto-commit-action@29183a25ec7450c8f6fbab7ff22ccd42d8ab7416
         with:
           commit_message: "chore(bump): update ci version to ${{ steps.set-version.outputs.VERSION }}"
           branch: master
-          file_pattern: '.github/workflows/docker-all.yml'
+          file_pattern: 'version.json'
         env:
-          GITHUB_TOKEN: ${{ secrets.WORKFLOWS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       -
         name: Release
@@ -47,7 +45,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker meta
+      - 
+        name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:

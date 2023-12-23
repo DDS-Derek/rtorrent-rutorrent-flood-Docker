@@ -4,17 +4,39 @@ on:
   workflow_dispatch:
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.platforms.outputs.matrix }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Create matrix
+        id: platforms
+        run: |
+          echo "matrix=$(jq -r '.matrix' version.json)" >>${GITHUB_OUTPUT}
+      -
+        name: Show matrix
+        run: |
+          echo ${{ steps.platforms.outputs.matrix }}
+
   build:
     runs-on: ubuntu-latest
+    needs:
+      - prepare
     strategy:
+      fail-fast: false
       matrix:
-        version: [ 3.10-0.9.8-0.13.8, 4.0-0.9.8-0.13.8, 4.0.1-0.9.8-0.13.8, 4.1.5-0.9.8-0.13.8, 4.1.7-0.9.8-0.13.8, 4.2.2-0.9.8-0.13.8, 4.2.5-0.9.8-0.13.8, 4.2.6-0.9.8-0.13.8, 4.2.9-0.9.8-0.13.8, edge, 4.2.9-0.9.8_1-0.13.8_1, latest ]
+        version: ${{ fromJson(needs.prepare.outputs.matrix) }}
     steps:
       - 
         name: Checkout
         uses: actions/checkout@master
       
-      - name: Docker meta
+      - 
+        name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
