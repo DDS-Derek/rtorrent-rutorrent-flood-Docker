@@ -1,40 +1,50 @@
-name: Build all
+name: Release
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - version.json
 
 jobs:
-  prepare:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.platforms.outputs.matrix }}
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-      -
-        name: Create matrix
-        id: platforms
-        run: |
-          echo "matrix=$(cat matrix.txt)" >>${GITHUB_OUTPUT}
-      -
-        name: Show matrix
-        run: |
-          echo ${{ steps.platforms.outputs.matrix }}
-
   build:
     runs-on: ubuntu-latest
-    needs:
-      - prepare
-    strategy:
-      fail-fast: false
-      matrix:
-        version: ${{ fromJson(needs.prepare.outputs.matrix) }}
     steps:
       - 
         name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
       
+      - 
+        name: Set Version
+        id: set-version
+        run: |
+          VERSION=$(jq -r '.version' version.json)
+          echo "VERSION=${VERSION}"
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          sed -i "1s|\"edge\"|\"${VERSION}\",&|" matrix.txt
+
+      -
+        uses: stefanzweifel/git-auto-commit-action@29183a25ec7450c8f6fbab7ff22ccd42d8ab7416
+        with:
+          commit_message: "chore(bump): update version to ${{ steps.set-version.outputs.VERSION }}"
+          branch: master
+          file_pattern: 'matrix.txt'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      -
+        name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.set-version.outputs.VERSION }}
+          name: ${{ steps.set-version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - 
         name: Docker meta
         id: meta
@@ -42,7 +52,8 @@ jobs:
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/rtorrent-rutorrent-flood
           tags: |
-            type=raw,value=${{ matrix.version }}
+            type=raw,value=${{ steps.set-version.outputs.VERSION }}
+            type=raw,value=latest
 
       - 
         name: Set Up QEMU
@@ -69,7 +80,7 @@ jobs:
             linux/amd64
             linux/arm64/v8
           build-args: |
-            RT_RU_VERSION=${{ matrix.version }}
+            RT_RU_VERSION=${{ steps.meta.outputs.version }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

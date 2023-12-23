@@ -1,25 +1,54 @@
-name: Build image edge
+name: Build
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 3 */6 * *'
-  workflow_dispatch:
 
 jobs:
-  push:
+  prepare:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.platforms.outputs.matrix }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Create matrix
+        id: platforms
+        run: |
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            echo "matrix=["edge"]" >> $GITHUB_OUTPUT
+          else
+            echo "matrix=$(cat matrix.txt)" >> $GITHUB_OUTPUT
+          fi
+      -
+        name: Show matrix
+        run: |
+          echo ${{ steps.platforms.outputs.matrix }}
+
+  build:
+    runs-on: ubuntu-latest
+    needs:
+      - prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ${{ fromJson(needs.prepare.outputs.matrix) }}
     steps:
       - 
         name: Checkout
         uses: actions/checkout@master
       
-      - name: Docker meta
+      - 
+        name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/rtorrent-rutorrent-flood
           tags: |
-            type=raw,value=edge
+            type=raw,value=${{ matrix.version }}
 
       - 
         name: Set Up QEMU
@@ -46,7 +75,7 @@ jobs:
             linux/amd64
             linux/arm64/v8
           build-args: |
-            RT_RU_VERSION=edge
+            RT_RU_VERSION=${{ matrix.version }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
