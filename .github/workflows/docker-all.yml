@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ${{ fromJson(needs.prepare.outputs.matrix) }}
+        version: ${{ needs.prepare.outputs.matrix }}
     steps:
       - 
         name: Checkout
