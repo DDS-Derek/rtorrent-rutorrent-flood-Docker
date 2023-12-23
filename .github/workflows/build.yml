@@ -18,7 +18,7 @@ jobs:
         name: Create matrix
         id: platforms
         run: |
-          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+          if [[ "${{ github.event_name }}" != "schedule" ]]; then
             echo "matrix=["edge"]" >> $GITHUB_OUTPUT
           else
             echo "matrix=$(cat matrix.txt)" >> $GITHUB_OUTPUT
