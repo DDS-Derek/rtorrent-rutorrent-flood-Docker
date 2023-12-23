@@ -19,7 +19,7 @@ jobs:
         id: platforms
         run: |
           if [[ "${{ github.event_name }}" != "schedule" ]]; then
-            echo "matrix=["edge"]" >> $GITHUB_OUTPUT
+            echo "matrix=[\"edge\"]" >> $GITHUB_OUTPUT
           else
             echo "matrix=$(cat matrix.txt)" >> $GITHUB_OUTPUT
           fi
