@@ -10,5 +10,5 @@ RUN set -ex && \
     npm ls --global && \
     npm cache clean --force
 
-COPY --from=crazymax/geoip-updater:1.9.0 /usr/local/bin/geoip-updater /usr/local/bin/geoip-updater
+COPY --from=crazymax/geoip-updater:1.10.0 /usr/local/bin/geoip-updater /usr/local/bin/geoip-updater
 COPY --chmod=755 ./rootfs /
