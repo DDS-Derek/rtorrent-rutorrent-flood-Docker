@@ -26,7 +26,7 @@ jobs:
           sed -i "1s|\"edge\"|\"${VERSION}\",&|" matrix.txt
 
       -
-        uses: stefanzweifel/git-auto-commit-action@01d77ca6cb089da1360e540865f7d035c95aa199
+        uses: stefanzweifel/git-auto-commit-action@547c1409cec143c754e148a6fbdfa359db836cf6
         with:
           commit_message: "chore(bump): update version to ${{ steps.set-version.outputs.VERSION }}"
           branch: master
